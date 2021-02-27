@@ -8,12 +8,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.example.mykeyboard.util.GlobalLayoutListener;
 import com.example.mykeyboard.util.OnKeyboardChangedListener;
+import com.example.mykeyboard.util.ScreenUtils;
 
 public class MyKeyboardBuilder implements View.OnClickListener {
 
@@ -25,6 +29,7 @@ public class MyKeyboardBuilder implements View.OnClickListener {
     private InputMethodManager inputMethodManager;//键盘管理类
     private boolean isKeyboardShow = false;
     private boolean isSwitch = false;//是否切换
+    private AnimationSet animationSetShow, animationSetHide;//动画效果
 
     public MyKeyboardBuilder(Builder builder){
         this.activity = builder.activity;
@@ -38,6 +43,7 @@ public class MyKeyboardBuilder implements View.OnClickListener {
         buildNumKeyboard();
         buildLetterKeyboard();
         buildSystemTop();
+        initAnimation();
         parent.setVisibility(View.GONE);
         inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         setListener();
@@ -116,6 +122,53 @@ public class MyKeyboardBuilder implements View.OnClickListener {
         systemTop.findViewById(R.id.iv_hide).setOnClickListener(this);
         parent.addView(systemTop);
         systemTop.setVisibility(View.GONE);
+    }
+
+    private void initAnimation(){
+        TranslateAnimation translateAnimationShow = new TranslateAnimation(
+                0, 0, ScreenUtils.dip2px(activity, 250), 0);
+        animationSetShow = new AnimationSet(false);
+        animationSetShow.addAnimation(translateAnimationShow);
+        animationSetShow.setDuration(500);
+        animationSetShow.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                Log.e(TAG, "动画开始");
+                parent.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        TranslateAnimation translateAnimationHide = new TranslateAnimation(
+                0, 0, 0, ScreenUtils.dip2px(activity, 250));
+        animationSetHide = new AnimationSet(false);
+        animationSetHide.addAnimation(translateAnimationHide);
+        animationSetHide.setDuration(500);
+        animationSetHide.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                Log.e(TAG, "动画结束");
+                parent.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
     }
 
     private void setListener(){
@@ -212,9 +265,9 @@ public class MyKeyboardBuilder implements View.OnClickListener {
 
     public void setParentShow(boolean isShow){
         if (isShow){
-            parent.setVisibility(View.VISIBLE);
+            parent.startAnimation(animationSetShow);
         } else {
-            parent.setVisibility(View.GONE);
+            parent.startAnimation(animationSetHide);
         }
     }
 
