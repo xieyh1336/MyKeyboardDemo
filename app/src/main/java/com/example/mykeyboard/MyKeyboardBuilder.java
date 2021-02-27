@@ -211,8 +211,12 @@ public class MyKeyboardBuilder implements View.OnClickListener {
                 isKeyboardShow = isShow;
                 if (isShow){
                     systemTop.setVisibility(View.VISIBLE);
+                    if (isSwitch){
+                        isSwitch = false;
+                    }
                 } else {
                     systemTop.setVisibility(View.GONE);
+                    Log.e(TAG, "isSwitch：" + isSwitch);
                     if (isSwitch){
                         isSwitch = false;
                     } else {
